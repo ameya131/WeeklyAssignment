@@ -1,24 +1,25 @@
 import java.util.*;
 
+class Bucket{
+    int tokens=5;
+    long last=System.currentTimeMillis();
+}
+
 public class weekly{
 
-    static HashMap<String,Integer> views=new HashMap<>();
-    static HashMap<String,Set<String>> visitors=new HashMap<>();
+    static HashMap<String,Bucket> map=new HashMap<>();
 
-    static void process(String url,String user){
-        views.put(url,views.getOrDefault(url,0)+1);
-        visitors.putIfAbsent(url,new HashSet<>());
-        visitors.get(url).add(user);
+    static boolean allow(String client){
+        Bucket b=map.computeIfAbsent(client,k->new Bucket());
+        if(b.tokens>0){
+            b.tokens--;
+            return true;
+        }
+        return false;
     }
 
     public static void main(String[] args){
-        process("/news","u1");
-        process("/news","u2");
-        process("/sports","u3");
-
-        views.entrySet().stream()
-                .sorted((a,b)->b.getValue()-a.getValue())
-                .limit(2)
-                .forEach(System.out::println);
+        for(int i=0;i<7;i++)
+            System.out.println(allow("abc"));
     }
 }
