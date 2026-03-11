@@ -1,30 +1,28 @@
 import java.util.*;
 
-class Entry{
-    String ip;
-    long expiry;
-    Entry(String ip,long ttl){
-        this.ip=ip;
-        this.expiry=System.currentTimeMillis()+ttl;
-    }
-}
+public class weekly {
 
-public class weekly{
-
-    static HashMap<String,Entry> cache=new HashMap<>();
-
-    static String resolve(String domain){
-        Entry e=cache.get(domain);
-        if(e!=null && System.currentTimeMillis()<e.expiry){
-            return "Cache HIT "+e.ip;
+    static Set<String> ngrams(String text,int n){
+        String[] w=text.split(" ");
+        Set<String> set=new HashSet<>();
+        for(int i=0;i<=w.length-n;i++){
+            String g="";
+            for(int j=0;j<n;j++) g+=w[i+j]+" ";
+            set.add(g.trim());
         }
-        String ip="172.1.1."+new Random().nextInt(255);
-        cache.put(domain,new Entry(ip,5000));
-        return "Cache MISS "+ip;
+        return set;
+    }
+
+    static double similarity(String a,String b){
+        Set<String> s1=ngrams(a,3);
+        Set<String> s2=ngrams(b,3);
+        s1.retainAll(s2);
+        return s1.size()*100.0/Math.max(1,s2.size());
     }
 
     public static void main(String[] args){
-        System.out.println(resolve("google.com"));
-        System.out.println(resolve("google.com"));
+        String d1="java is a programming language used worldwide";
+        String d2="java is a programming language used in many systems";
+        System.out.println("Similarity "+similarity(d1,d2)+"%");
     }
 }
