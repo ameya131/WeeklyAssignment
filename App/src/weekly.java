@@ -1,25 +1,30 @@
 import java.util.*;
 
-public class weekly {
+class Entry{
+    String ip;
+    long expiry;
+    Entry(String ip,long ttl){
+        this.ip=ip;
+        this.expiry=System.currentTimeMillis()+ttl;
+    }
+}
 
-    static HashMap<String,Integer> stock = new HashMap<>();
-    static Queue<Integer> waiting = new LinkedList<>();
+public class weekly{
 
-    static synchronized void purchase(String product,int user){
-        int s = stock.getOrDefault(product,0);
-        if(s>0){
-            stock.put(product,s-1);
-            System.out.println("Success, remaining "+(s-1));
-        }else{
-            waiting.add(user);
-            System.out.println("Added to waiting list position "+waiting.size());
+    static HashMap<String,Entry> cache=new HashMap<>();
+
+    static String resolve(String domain){
+        Entry e=cache.get(domain);
+        if(e!=null && System.currentTimeMillis()<e.expiry){
+            return "Cache HIT "+e.ip;
         }
+        String ip="172.1.1."+new Random().nextInt(255);
+        cache.put(domain,new Entry(ip,5000));
+        return "Cache MISS "+ip;
     }
 
     public static void main(String[] args){
-        stock.put("IPHONE15",2);
-        purchase("IPHONE15",101);
-        purchase("IPHONE15",102);
-        purchase("IPHONE15",103);
+        System.out.println(resolve("google.com"));
+        System.out.println(resolve("google.com"));
     }
 }
