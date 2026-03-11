@@ -2,31 +2,24 @@ import java.util.*;
 
 public class weekly {
 
-    static HashMap<String,Integer> users = new HashMap<>();
-    static HashMap<String,Integer> attempts = new HashMap<>();
+    static HashMap<String,Integer> stock = new HashMap<>();
+    static Queue<Integer> waiting = new LinkedList<>();
 
-    static boolean checkAvailability(String username){
-        attempts.put(username, attempts.getOrDefault(username,0)+1);
-        return !users.containsKey(username);
-    }
-
-    static List<String> suggest(String username){
-        List<String> list = new ArrayList<>();
-        list.add(username+"1");
-        list.add(username+"2");
-        list.add(username.replace("_","."));
-        return list;
-    }
-
-    static String getMostAttempted(){
-        return Collections.max(attempts.entrySet(),Map.Entry.comparingByValue()).getKey();
+    static synchronized void purchase(String product,int user){
+        int s = stock.getOrDefault(product,0);
+        if(s>0){
+            stock.put(product,s-1);
+            System.out.println("Success, remaining "+(s-1));
+        }else{
+            waiting.add(user);
+            System.out.println("Added to waiting list position "+waiting.size());
+        }
     }
 
     public static void main(String[] args){
-        users.put("john_doe",1);
-
-        System.out.println(checkAvailability("john_doe"));
-        System.out.println(checkAvailability("jane_smith"));
-        System.out.println(suggest("john_doe"));
+        stock.put("IPHONE15",2);
+        purchase("IPHONE15",101);
+        purchase("IPHONE15",102);
+        purchase("IPHONE15",103);
     }
 }
